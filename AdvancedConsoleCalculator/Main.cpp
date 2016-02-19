@@ -123,8 +123,7 @@ double calc(std::string math) {
 	return _calc(begin, math.end());
 }
 
-class ConsoleHelper {
-public:
+namespace console {
 	static char get_char_async() {
 		auto hConsole = GetStdHandle(STD_INPUT_HANDLE);
 		DWORD oldModeValue;
@@ -149,32 +148,32 @@ public:
 	static void set_color(unsigned short color) {
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 	}
-};
+}
 
 int main() {
 	std::string buffer;
 	while(1) {
-		auto chr = ConsoleHelper::get_char_async();
+		auto chr = console::get_char_async();
 		if(chr == '\b') {
 			if(!buffer.empty()) {
 				buffer.pop_back();
-				auto pos = ConsoleHelper::get_position();
+				auto pos = console::get_position();
 				std::cout << "\b \b";
 			}
 		} else if(buffer.length() < 79) {
 			buffer += chr;
 			if(chr == '+' || chr == '-' || chr == '*' || chr == '/' || chr == '^' || chr == '%')
-				ConsoleHelper::set_color(FOREGROUND_RED | FOREGROUND_INTENSITY);
+				console::set_color(FOREGROUND_RED | FOREGROUND_INTENSITY);
 			else if(chr == '(' || chr == ')')
-				ConsoleHelper::set_color(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+				console::set_color(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 			std::cout << chr;
-			ConsoleHelper::set_color(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+			console::set_color(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 		}
-		auto pos = ConsoleHelper::get_position();
-		ConsoleHelper::set_position(0, pos.second + 1);
-		ConsoleHelper::set_color(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+		auto pos = console::get_position();
+		console::set_position(0, pos.second + 1);
+		console::set_color(FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 		std::cout << '=' << std::setw(79) << std::setfill(' ') << std::left << calc(buffer);
-		ConsoleHelper::set_color(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
-		ConsoleHelper::set_position(pos.first, pos.second);
+		console::set_color(FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
+		console::set_position(pos.first, pos.second);
 	}
 }
